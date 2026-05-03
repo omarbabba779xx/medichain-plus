@@ -36,7 +36,7 @@ sequenceDiagram
     R->>S: submitClaim(id, patient, diagHash, amount)
     Note over S: status = Pending ⏳
 
-    H->>F: FillPrescription(rxId, pharmacyId)
+    H->>F: FillPrescription(rxId)
     F-->>R: event PrescriptionDispensed
     R->>S: validateAndPay(id, proofHash)
     S->>P: USDC transfer (coverageAtSubmission %)
@@ -109,7 +109,7 @@ stateDiagram-v2
     [*] --> Pending : submitClaim() — INSURER_ROLE
     Pending --> Paid : validateAndPay() — ORACLE_ROLE\n(hash match + deadline not exceeded)
     Pending --> Rejected : rejectClaim() — ORACLE_ROLE
-    Pending --> Rejected : validateAndPay() after deadline\n(30 days default)
+    Pending --> Pending : validateAndPay() after deadline → REVERT\n(status unchanged, claim stays Pending)
     Paid --> [*]
     Rejected --> [*]
 ```
@@ -119,17 +119,13 @@ stateDiagram-v2
 ```mermaid
 graph LR
     subgraph HospitalMSP
-        IP[IssuePrescription]
-        AC[ApproveClaim]
+        IP["IssuePrescription\n(rxId, patientId, patientEthAddress,\ndoctorId, medication, dosage, price)"]
     end
     subgraph PharmacyMSP
-        FP[FillPrescription]
-        SC[SubmitClaim]
-        AC2[ApproveClaim]
+        FP["FillPrescription\n(rxId) — pharmacistMSP from cert"]
     end
     subgraph AnyMSP
         GP[GetPrescription - read only]
-        GC[GetClaim - read only]
     end
 ```
 
@@ -378,6 +374,7 @@ from the last processed Fabric block with no missed or duplicate events.
 | `FABRIC_CHANNEL` | No | `medichain-channel` | Fabric channel name |
 | `CHAINCODE_NAME` | No | `medichain` | Chaincode name |
 | `CURSOR_FILE` | No | `bridge/.relayer-cursor.json` | Block cursor path |
+| `BRIDGE_DEFAULT_PATIENT_ADDRESS` | No | — | Fallback ETH address if Fabric event omits `patientAddress` |
 
 ### Fabric Network
 
