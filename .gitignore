@@ -21,3 +21,9 @@ chaincode/go.sum
 deployment.json
 .claude/
 .windsurf/
+.cursor/
+.cursorrules
+.cursorignore
+.copilot/
+.continue/
+.tabnine/
