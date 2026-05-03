@@ -5,7 +5,7 @@
   "exclude_medium": false,
   "exclude_high": false,
   "exclude_dependencies": true,
-  "filter_paths": "node_modules|test|artifacts|cache",
+  "filter_paths": "node_modules|test|artifacts|cache|MockERC20",
   "solc_remaps": ["@openzeppelin=node_modules/@openzeppelin"],
   "compile_force_framework": "hardhat",
   "markdown_root": "docs/audit/"

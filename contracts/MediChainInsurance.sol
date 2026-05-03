@@ -110,14 +110,15 @@ contract MediChainInsurance is AccessControl, ReentrancyGuard, Pausable {
         require(block.timestamp <= c.deadline,       "Claim expired");
         require(c.diagnosisHash == proofHash,        "Hash mismatch");
 
-        uint256 payout = (c.amount * c.coverageAtSubmission) / 100;
+        address patient = c.patient;  // cache before external call — Slither CEI
+        uint256 payout    = (c.amount * c.coverageAtSubmission) / 100;
         require(stablecoin.balanceOf(address(this)) >= payout, "Insufficient treasury");
 
         c.status = Status.Paid;
         totalPaid += payout;
 
-        require(stablecoin.transfer(c.patient, payout), "Transfer failed");
-        emit ClaimPaid(id, c.patient, payout);
+        require(stablecoin.transfer(patient, payout), "Transfer failed");
+        emit ClaimPaid(id, patient, payout);
     }
 
     function rejectClaim(bytes32 id, string calldata reason)

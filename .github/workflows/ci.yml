@@ -61,7 +61,7 @@ jobs:
           node-version: "20"
           sarif: slither.sarif
           fail-on: high
-          slither-args: "--exclude-dependencies --filter-paths node_modules,test,artifacts,cache"
+          slither-args: "--exclude-dependencies --filter-paths node_modules|test|artifacts|cache|MockERC20"
       - name: Upload SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
