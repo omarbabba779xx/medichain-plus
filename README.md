@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/MediChain+-Healthcare%20Blockchain-10b981?style=for-the-badge&logoColor=white" alt="MediChain+" height="40"/>
+<img src="https://img.shields.io/badge/MediChain+-Healthcare%20Blockchain-0ea5e9?style=for-the-badge&logoColor=white" alt="MediChain+" height="40"/>
 
 # MediChain+
 
@@ -83,25 +83,25 @@ A prescription is issued by a hospital doctor on the **Fabric private ledger**. 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant H as 🏥 Hospital (HospitalMSP)
-    participant F as 🔗 Fabric Ledger
-    participant R as ⚡ Bridge Relayer
-    participant S as 📜 MediChainInsurance.sol
-    participant P as 👤 Patient Wallet
+    participant H as Hospital (HospitalMSP)
+    participant F as Fabric Ledger
+    participant R as Bridge Relayer
+    participant S as MediChainInsurance.sol
+    participant P as Patient Wallet
 
     H->>F: IssuePrescription(rxId, patientEthAddress, medication, price)
     Note over F: SHA-256 hash computed deterministically
     F-->>R: event PrescriptionIssued {rxId, diagnosisHash, amount}
     R->>S: submitClaim(id, patient, diagHash, amount)
-    Note over S: Claim stored · status = Pending ⏳<br/>deadline = now + 30 days
+    Note over S: Claim stored - status = Pending<br/>deadline = now + 30 days
 
     H->>F: FillPrescription(rxId)
     Note over F: pharmacistMSP derived from X.509 cert
     F-->>R: event PrescriptionDispensed {prescriptionId, diagnosisHash}
     R->>S: validateAndPay(id, proofHash)
-    Note over S: Verifies diagnosisHash · checks deadline
-    S->>P: USDC transfer (amount × coverageAtSubmission%)
-    Note over S: status = Paid ✅ · totalPaid updated
+    Note over S: Verifies diagnosisHash - checks deadline
+    S->>P: USDC transfer (amount x coverageAtSubmission%)
+    Note over S: status = Paid - totalPaid updated
 ```
 
 ---
@@ -110,33 +110,33 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    subgraph Fabric["🔗 Hyperledger Fabric 2.5 — medichain-channel"]
+    subgraph Fabric["Hyperledger Fabric 2.5 - medichain-channel"]
         direction TB
-        H["🏥 HospitalMSP<br/>peer0 · CA · CouchDB"]
-        Ph["💊 PharmacyMSP<br/>peer0 · CA · CouchDB"]
-        O["⚙️ Orderer — Raft consensus"]
-        CC["📦 Chaincode: medichain (CCaaS)<br/>IssuePrescription · FillPrescription<br/>SubmitClaim · ApproveClaim · GetPrescription"]
+        H["HospitalMSP<br/>peer0 - CA - CouchDB"]
+        Ph["PharmacyMSP<br/>peer0 - CA - CouchDB"]
+        O["Orderer - Raft consensus"]
+        CC["Chaincode: medichain CCaaS<br/>IssuePrescription - FillPrescription<br/>SubmitClaim - ApproveClaim - GetPrescription"]
         H --> CC
         Ph --> CC
         CC --> O
     end
 
-    subgraph Bridge["⚡ Bridge Relayer — Node.js ESM / ethers v6"]
+    subgraph Bridge["Bridge Relayer - Node.js ESM / ethers v6"]
         direction TB
-        RF["🛡️ requireField()<br/>zero-address guard"]
-        WR["🔄 withRetry()<br/>5× exponential back-off"]
-        CUR["💾 Persistent cursor<br/>.relayer-cursor.json"]
+        RF["requireField()<br/>zero-address guard"]
+        WR["withRetry()<br/>5x exponential back-off"]
+        CUR["Persistent cursor<br/>.relayer-cursor.json"]
     end
 
-    subgraph Polygon["🔷 Polygon Amoy — Solidity 0.8.20"]
+    subgraph Polygon["Polygon Amoy - Solidity 0.8.20"]
         direction TB
-        INS["📜 MediChainInsurance.sol<br/>AccessControl · ReentrancyGuard · Pausable"]
-        USDC["💵 USDC Treasury<br/>ERC-20 · 6 decimals"]
+        INS["MediChainInsurance.sol<br/>AccessControl - ReentrancyGuard - Pausable"]
+        USDC["USDC Treasury<br/>ERC-20 - 6 decimals"]
         INS --> USDC
     end
 
-    subgraph Frontend["🌐 Progressive Web App"]
-        APP["app.html · app.js · sw.js<br/>MetaMask · Dark mode · PWA"]
+    subgraph Frontend["Progressive Web App"]
+        APP["app.html - app.js - sw.js<br/>MetaMask - Dark mode - PWA"]
     end
 
     Fabric -->|"PrescriptionIssued<br/>PrescriptionDispensed"| Bridge
@@ -171,13 +171,13 @@ graph TB
 ```mermaid
 stateDiagram-v2
     direction LR
-    [*] --> Pending : submitClaim()\nINSURER_ROLE
-    Pending --> Paid : validateAndPay()\nORACLE_ROLE · hash ✓ · deadline ✓
-    Pending --> Rejected : rejectClaim()\nORACLE_ROLE
+    [*] --> Pending : submitClaim() / INSURER_ROLE
+    Pending --> Paid : validateAndPay() / ORACLE_ROLE - hash ok - deadline ok
+    Pending --> Rejected : rejectClaim() / ORACLE_ROLE
     Paid --> [*]
     Rejected --> [*]
     note right of Pending
-        validateAndPay() after deadline → REVERT
+        validateAndPay() after deadline: REVERT
         Claim stays Pending until explicit rejectClaim()
     end note
 ```
@@ -266,18 +266,18 @@ Every push triggers an 8-job pipeline. Only **5 jobs block merge** — analytica
 
 ```mermaid
 graph LR
-    push(["📤 git push"])
-    push --> GL["🔑 Gitleaks<br/>secrets scan"]
-    GL --> SOL["⚗️ Hardhat<br/>compile + 18 tests"]
-    GL --> GO["🐹 Go chaincode<br/>build + test -race"]
-    GL --> BR["🌉 Bridge smoke<br/>mock mode"]
-    SOL --> SL["🔍 Slither<br/>fail-on: high"]
-    SL --> GATE{{"✅ Status<br/>Gate"}}
+    push(["git push"])
+    push --> GL["Gitleaks<br/>secrets scan"]
+    GL --> SOL["Hardhat<br/>compile + 18 tests"]
+    GL --> GO["Go chaincode<br/>build + test -race"]
+    GL --> BR["Bridge smoke<br/>mock mode"]
+    SOL --> SL["Slither<br/>fail-on: high"]
+    SL --> GATE{{"Status Gate"}}
     GO --> GATE
     BR --> GATE
-    SOL --> SH["📐 Solhint<br/>style lint"]
-    SOL --> MY["🔬 Mythril<br/>symbolic exec"]
-    SOL --> SG["🛡️ Semgrep<br/>SAST"]
+    SOL --> SH["Solhint<br/>style lint"]
+    SOL --> MY["Mythril<br/>symbolic exec"]
+    SOL --> SG["Semgrep<br/>SAST"]
     SH -.->|informational| GATE
     MY -.->|informational| GATE
     SG -.->|informational| GATE
